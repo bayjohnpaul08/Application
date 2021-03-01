@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ManufacturersFragment"
+    android:paddingTop="?attr/actionBarSize">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:src="@drawable/ic_empty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/view"
+        android:id="@+id/emptyImage"
+        app:layout_constraintVertical_bias="0.385"
+        app:layout_constraintTop_toTopOf="@+id/view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        android:visibility="gone"
+        android:alpha="0.1"/>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/emptyImage"
+        android:id="@+id/noData"
+        app:layout_constraintStart_toStartOf="@+id/emptyImage"
+        android:visibility="gone"
+        android:alpha="0.4"
+        app:layout_constraintTop_toBottomOf="@+id/emptyImage"
+        android:textSize="20dp" android:text="No data"
+        android:layout_marginTop="8dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
