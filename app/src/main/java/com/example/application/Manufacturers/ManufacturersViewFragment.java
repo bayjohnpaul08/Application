@@ -1,7 +1,6 @@
 package com.example.application.Manufacturers;
 
 import android.content.DialogInterface;
-import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,16 +22,12 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.application.DbHelper;
-import com.example.application.Manufacturers.ManufacturersFragment;
-import com.example.application.Manufacturers.ManufacturersHelperClass;
 import com.example.application.Products.ProductAdapter;
 import com.example.application.Products.ProductEditFragment;
 import com.example.application.Products.ProductModel;
 import com.example.application.Products.ProductViewFragment;
 import com.example.application.Products.ProductsFragment;
 import com.example.application.R;
-import com.example.application.RelatedAdapter;
-import com.example.application.RelatedProductsHelperClass;
 
 import java.util.ArrayList;
 
