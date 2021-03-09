@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddManufacturersFragment">
+    tools:context=".Manufacturers.AddManufacturersFragment">
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -28,6 +28,14 @@
             android:ems="10"
             android:inputType="textCapWords" />
     </com.google.android.material.textfield.TextInputLayout>
+
+<!--    <TextView-->
+<!--        android:id="@+id/manufacturersCode"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="TextView"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/field1"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/field1" />-->
 
     <TextView
         android:id="@+id/date"

@@ -1,16 +1,12 @@
-package com.example.application;
+package com.example.application.Products;
 
 import android.Manifest;
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -27,8 +23,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,56 +38,84 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.application.DbHelper;
+import com.example.application.GetManufacturerNameModel;
+import com.example.application.Manufacturers.ManufacturersFragment;
+import com.example.application.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AddManufacturersFragment extends Fragment {
+public class AddProductsFragment extends Fragment implements View.OnClickListener {
 
-    private EditText manufacturersName;
-    private ImageView manufacturersImage;
-    private TextView date;
-    private Button chooseImage, addButton;
-    Bitmap bitmap;
+    private TextView productDate;
+    private EditText productName, productPrice;
+    private AutoCompleteTextView productManufacturer;
+    private Button productButtonImage, productAddButton;
+    private ImageView productImageView;
     Uri selectedImageUri;
+    Bitmap bitmap;
     DbHelper db;
+    ArrayList<GetManufacturerNameModel> nameList = new ArrayList<>();
 
-    public AddManufacturersFragment() {
+    public AddProductsFragment() {
         // Required empty public constructor
     }
 
-    private static final int REQUEST_CODE_STORAGE_PERMISSION = 1;
-    private static final int REQUEST_CODE_SELECT_IMAGE = 2 ;
+    private static final int REQUEST_CODE_STORAGE_PERMISSION = 3;
+    private static final int REQUEST_CODE_SELECT_IMAGE = 4;
 
-    String urlUpload = "http://192.168.0.105/pictures/index.php";
+    String productUrlImage = "http://192.168.0.106/pictures/index.php";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_add_manufacturers, container, false);
-
+        View view = inflater.inflate(R.layout.fragment_add_products, container, false);
         db = new DbHelper(getActivity());
 
-        manufacturersName = (EditText) view.findViewById(R.id.manufacturersName);
-        manufacturersImage = (ImageView) view.findViewById(R.id.manufacturersImage);
-        chooseImage = (Button) view.findViewById(R.id.chooseImage);
-        addButton = (Button) view.findViewById(R.id.addButton);
-        date = (TextView) view.findViewById(R.id.date);;
+        productDate = (TextView) view.findViewById(R.id.productDate);
+        productName = (EditText) view.findViewById(R.id.productName);
+        productPrice = (EditText) view.findViewById(R.id.productPrice);
+        productManufacturer = (AutoCompleteTextView) view.findViewById(R.id.productManufacturer);
+        productButtonImage = (Button) view.findViewById(R.id.productImage);
+        productAddButton = (Button) view.findViewById(R.id.productAddButton);
+        productImageView = (ImageView) view.findViewById(R.id.productImageView);
+        productButtonImage.setOnClickListener(this);
+        productAddButton.setOnClickListener(this);
 
-        Calendar calendar = Calendar.getInstance();
-        String currentDate = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
-        date.setText(currentDate);
+        String currentDate = String.valueOf(android.text.format.DateFormat.format("yyyy-MM-dd", new java.util.Date()));
+        productDate.setText(currentDate);
 
-        chooseImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        Cursor cursor = db.ManufacturerColumnName();
+
+        while (cursor.moveToNext()) {
+            GetManufacturerNameModel name = new GetManufacturerNameModel(cursor.getString(0));
+            nameList.add(name);
+        }
+
+        ArrayAdapter arrayAdapter = new ArrayAdapter(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, nameList);
+        productManufacturer.setAdapter(arrayAdapter);
+
+
+        return view;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.productImage:
 
                 if(ContextCompat.checkSelfPermission(
                         getActivity().getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE
@@ -100,43 +125,39 @@ public class AddManufacturersFragment extends Fragment {
                             REQUEST_CODE_STORAGE_PERMISSION
                     );
                 }else {
-                    selectImage();
+                    uploadProductImage();
                 }
-            }
-        });
 
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addData();
-            }
-        });
+                break;
 
-
-
-        return view;
+            case R.id.productAddButton:
+                addNewProduct();
+        }
     }
 
-    private void addData() {
-        if(manufacturersName.getText().toString().isEmpty()){
-            Toast.makeText(getActivity(), "The name of Manufacturer is required.", Toast.LENGTH_SHORT).show();
+    private void addNewProduct() {
+        if(productName.getText().toString().isEmpty()){
+            Toast.makeText(getActivity(), "The name of Product is required.", Toast.LENGTH_SHORT).show();
         }else{
 
-            boolean isInserted = db.addManufacturer(
-                    manufacturersName.getText().toString().trim(),
-                    date.getText().toString().trim(),
-                    date.getText().toString().trim(),
+            boolean isInserted = db.addProduct(
+                    productName.getText().toString().trim(),
+                    productDate.getText().toString().trim(),
+                    productDate.getText().toString().trim(),
+                    Integer.valueOf(productPrice.getText().toString().trim()),
+                    productManufacturer.getText().toString().trim(),
                     selectedImageUri.toString()
             );
+            Log.d("test", String.valueOf(isInserted));
 
-            if(isInserted == true){
-                Toast.makeText(getActivity(), "Manufacturer Successfully Added.",Toast.LENGTH_SHORT).show();
+            if(isInserted){
+                Toast.makeText(getActivity(), "Product Successfully Added.",Toast.LENGTH_SHORT).show();
             }
             else {
                 Toast.makeText(getActivity(), "Failed to Add.",Toast.LENGTH_SHORT).show();
             }
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, urlUpload, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, productUrlImage, new com.android.volley.Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                 }
@@ -161,21 +182,14 @@ public class AddManufacturersFragment extends Fragment {
             FragmentManager fragmentManager =getParentFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            ManufacturersFragment fragment = new ManufacturersFragment();
+            ProductsFragment fragment = new ProductsFragment();
 
             fragmentTransaction.replace(R.id.container_fragment, fragment);
             fragmentTransaction.commit();
         }
     }
 
-    // upload image
-    private void imageSave() {
-
-
-    }
-
-
-    private void selectImage() {
+    private void uploadProductImage() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         if(intent.resolveActivity(getActivity().getPackageManager()) != null){
             startActivityForResult(intent, REQUEST_CODE_SELECT_IMAGE);
@@ -188,7 +202,7 @@ public class AddManufacturersFragment extends Fragment {
 
         if(requestCode == REQUEST_CODE_STORAGE_PERMISSION && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                selectImage();
+                uploadProductImage();
             } else{
                 Toast.makeText(getActivity(), "Permission Denied.", Toast.LENGTH_SHORT).show();
             }
@@ -211,7 +225,7 @@ public class AddManufacturersFragment extends Fragment {
                 try {
                     InputStream inputStream = getActivity().getContentResolver().openInputStream(selectedImageUri);
                     bitmap = BitmapFactory.decodeStream(inputStream);
-                    manufacturersImage.setImageBitmap(bitmap);
+                    productImageView.setImageBitmap(bitmap);
 
                 }catch (Exception exception) {
                     Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_SHORT).show();
@@ -220,22 +234,6 @@ public class AddManufacturersFragment extends Fragment {
 
         }
     }
-
-//    private String getPathFromUri(Uri contentUri) {
-//        String filePath;
-//        Cursor cursor = getActivity().getContentResolver()
-//                .query(contentUri, null, null, null, null);
-//
-//        if (cursor == null) {
-//            filePath = contentUri.getPath();
-//        }else{
-//            cursor.moveToFirst();
-//            int index = cursor.getColumnIndex("_data");
-//            filePath = cursor.getString(index);
-//            cursor.close();
-//        }
-//        return filePath;
-//    }
 
     // converting image
     private String imageToString(Bitmap bitmap) {

@@ -1,4 +1,4 @@
-package com.example.application;
+package com.example.application.Manufacturers;
 
 import android.os.Build;
 import android.os.Parcel;
@@ -13,22 +13,30 @@ import java.util.Objects;
 public class ManufacturersHelperClass implements Parcelable {
 
     private String id;
+    private String manufacturersCode;
     private String manufacturersName;
     private String manufacturersCreated;
     private String manufacturersModified;
     private String manufacturersImage;
 
-    public ManufacturersHelperClass(String id, String manufacturersName, String manufacturersCreated, String manufacturersModified, String manufacturersImage) {
+    public ManufacturersHelperClass() {
+
+    }
+
+    public ManufacturersHelperClass(String id, String manufacturersCode, String manufacturersName, String manufacturersCreated, String manufacturersModified, String manufacturersImage) {
+        this.id = id;
+        this.manufacturersCode = manufacturersCode;
         this.manufacturersName = manufacturersName;
         this.manufacturersCreated = manufacturersCreated;
         this.manufacturersModified = manufacturersModified;
         this.manufacturersImage = manufacturersImage;
-        this.id = id;
+
     }
 
     public ManufacturersHelperClass(String s, String id) {
         this.id = id;
     }
+
 
     public String getId() {
         return id;
@@ -57,6 +65,14 @@ public class ManufacturersHelperClass implements Parcelable {
             return new ManufacturersHelperClass[size];
         }
     };
+
+    public String getManufacturersCode() {
+        return manufacturersCode;
+    }
+
+    public void setManufacturersCode(String manufacturersCode) {
+        this.manufacturersCode = manufacturersCode;
+    }
 
     public String getManufacturersName() {
         return manufacturersName;

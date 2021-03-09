@@ -1,6 +1,5 @@
-package com.example.application;
+package com.example.application.Manufacturers;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.application.DbHelper;
+import com.example.application.R;
 
 import java.util.ArrayList;
 
@@ -34,7 +33,6 @@ public class ManufacturersFragment extends Fragment implements Adapter.OnclickIn
     ArrayList <ManufacturersHelperClass> manufacturersList = new ArrayList<>();
     TextView noData;
     ImageView noImage;
-
 
     public ManufacturersFragment() {
         // Required empty public constructor
@@ -82,7 +80,8 @@ public class ManufacturersFragment extends Fragment implements Adapter.OnclickIn
                     cursor.getString(1),
                     cursor.getString(2),
                     cursor.getString(3),
-                    cursor.getString(4));
+                    cursor.getString(4),
+                    cursor.getString(5));
             manufacturersList.add(obj);
         }
         adapter = new Adapter(ManufacturersHelperClass.DIFF_CALLBACK,this );

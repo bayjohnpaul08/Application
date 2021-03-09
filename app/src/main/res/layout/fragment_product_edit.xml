@@ -1,32 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Products.AddProductsFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Products.ProductEditFragment"
+    android:paddingTop="?attr/actionBarSize">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/editProductDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:text="NEW PRODUCTS"
-        android:textSize="25dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/productDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
         android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintBottom_toTopOf="@+id/field2"
+        app:layout_constraintEnd_toEndOf="@+id/field2" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/field2"
@@ -35,16 +22,17 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
         android:hint="Product Name"
-        app:layout_constraintEnd_toEndOf="@+id/textView2"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/productDate">
+        app:layout_constraintEnd_toEndOf="@+id/editProductImage"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="@+id/editProductImage"
+        app:layout_constraintTop_toBottomOf="@+id/editProductImage">
 
         <EditText
-            android:id="@+id/productName"
+            android:id="@+id/editProductName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -67,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/field2">
 
         <EditText
-            android:id="@+id/productPrice"
+            android:id="@+id/editProductPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -84,13 +72,14 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
+        android:focusable="false"
         android:hint="Product Manufacturer"
         app:layout_constraintEnd_toEndOf="@+id/field3"
         app:layout_constraintStart_toStartOf="@+id/field3"
         app:layout_constraintTop_toBottomOf="@+id/field3">
 
         <AutoCompleteTextView
-            android:id="@+id/productManufacturer"
+            android:id="@+id/editProductManufacturer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -98,31 +87,42 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/productImage"
+        android:id="@+id/editProductButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Choose product Image"
-        app:layout_constraintStart_toStartOf="@+id/field4"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:backgroundTint="@color/green"
+        android:text="SUBMIT"
+        app:layout_constraintEnd_toStartOf="@+id/backButton"
+        app:layout_constraintTop_toTopOf="@+id/backButton" />
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/blue"
+        android:text="back"
+        app:layout_constraintEnd_toEndOf="@+id/field4"
         app:layout_constraintTop_toBottomOf="@+id/field4" />
 
     <ImageView
-        android:id="@+id/productImageView"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/app_name"
-        app:layout_constraintStart_toStartOf="@+id/productImage"
-        app:layout_constraintTop_toBottomOf="@+id/productImage" />
+        android:id="@+id/editProductImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/noimage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/productAddButton"
+    <TextView
+        android:id="@+id/editProductId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="add Product"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="@+id/editProductDate"
+        app:layout_constraintTop_toTopOf="@+id/editProductImage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

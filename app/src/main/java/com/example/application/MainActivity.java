@@ -2,21 +2,20 @@ package com.example.application;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Menu;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.HttpClientStack;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.application.Manufacturers.Adapter;
+import com.example.application.Manufacturers.AddManufacturersFragment;
+import com.example.application.Manufacturers.ManufacturersFragment;
+import com.example.application.Manufacturers.ManufacturersHelperClass;
+import com.example.application.Products.AddProductsFragment;
+import com.example.application.Products.ProductViewFragment;
+import com.example.application.Products.ProductsFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -24,10 +23,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -43,7 +38,6 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -60,16 +54,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavigationView navigationView;
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
-    public static final String url = "http://localhost/pictures/connection.php";
-    Adapter adapter;
-    String getId, getName, getCreated, getModified, getImage;
-    List<ManufacturersHelperClass> list = new ArrayList<>();
-    ManufacturersHelperClass manufacturersHelperClass;
-
     DbHelper db;
-    TextView txtField;
-    Button btn, upload;
     ProgressDialog pd;
+    ArrayList<ManufacturersHelperClass> manufacturersHelperClasses = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container_fragment, new ProductsFragment());
             fragmentTransaction.commit();
+
         }
 
         if (item.getItemId() == R.id.addProducts) {
@@ -128,7 +116,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         if (item.getItemId() == R.id.upload) {
-            uploadToMysql();
+          UploadToMysql();
+
         }
 
         if (item.getItemId() == R.id.download) {
@@ -141,11 +130,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void uploadToMysql() {
+    private void UploadToMysql() {
 
         OkHttpClient client = new OkHttpClient();
 
-        String url = "http://192.168.0.109/practice/manufacturers/uploadToMysql";
+        String manufacturerUrl = "http://192.168.0.106/practice/manufacturers/manufacturerToMysql";
+        String productUrl = "http://192.168.0.106/practice/products/productToMysql";
 
         // progress dialog
         pd = new ProgressDialog(this);
@@ -156,54 +146,65 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         try {
 
-            JSONArray manufacturersArray = db.readAllNotUploadedData();
+            final Callback callback = new Callback() {
 
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("manufacturers", manufacturersArray.toString())
-                    .build();
-
-            Request request = new Request.Builder()
-                    .url(url)
-                    .post(requestBody)
-                    .build();
-
-            client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             pd.dismiss();
-
-                            Log.i("ASDF", e.getMessage());
-                            txtField.setText("Failure !");
+                            Toast.makeText(MainActivity.this, "error: " + e.toString(), Toast.LENGTH_SHORT).show();
                         }
                     });
-
                 }
 
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    try {
-                        Log.i("ASDF",response.body().string());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             pd.dismiss();
 
+                            Log.i("get", String.valueOf(response));
                             Toast.makeText(MainActivity.this, "Data successfully uploaded to backend", Toast.LENGTH_SHORT).show();
                             db.updateAsUploaded();
+                            db.productUpdateAsUploaded();
                         }
                     });
                 }
-            });
+            };
+
+            JSONArray manufacturersArray = db.readAllNotUploadedData();
+            JSONArray productsArray = db.productReadAllNotUploadedData();
+
+
+            // MANUFACTURER REQUEST
+            RequestBody manufacturer = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("manufacturers", manufacturersArray.toString())
+                    .build();
+
+            Request manufacturerRequest = new Request.Builder()
+                    .url(manufacturerUrl)
+                    .post(manufacturer)
+                    .build();
+
+            // PRODUCT REQUEST
+            RequestBody product = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("products", productsArray.toString())
+                    .build();
+            Log.i("prod", productsArray.toString());
+
+            Request productRequest = new Request.Builder()
+                    .url(productUrl)
+                    .post(product)
+                    .build();
+
+            client.newCall(productRequest).enqueue(callback);
+            client.newCall(manufacturerRequest).enqueue(callback);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -211,7 +212,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void downloadToSql() throws JSONException  {
 
-        String url1 = "http://192.168.0.109/practice/manufacturers/downloadToSql";
+        String manufacturerUrl = "http://192.168.0.106/practice/manufacturers/downloadToSql";
+        String productUrl = "http://192.168.0.106/practice/products/productToSqlite";
+
         OkHttpClient client = new OkHttpClient();
 
         // progress dialog
@@ -220,22 +223,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pd.setCancelable(false);
         pd.show();
 
-        final Request request = new Request.Builder().url(url1).build();
-        client.newCall(request).enqueue(new Callback() {
+        final Request manufacturerRequest = new Request.Builder().url( manufacturerUrl).build();
+        final Request productRequest = new Request.Builder().url(productUrl).build();
+
+        client.newCall(manufacturerRequest).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         pd.dismiss();
-
                         Log.i(TAG, e.getMessage());
-                        txtField.setText("Failure !");
+                        Toast.makeText(MainActivity.this, "error: " + e.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
-
             }
-
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 runOnUiThread(new Runnable() {
@@ -245,29 +247,83 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             pd.dismiss();
 
                             JSONArray jsonArray = new JSONArray(response.body().string());
+                            Log.i("get", jsonArray.toString());
 
-                            if(jsonArray != null && jsonArray.length() > 0){
+                            if(jsonArray.length() > 0){
                                 for (int i = 0; i < jsonArray.length(); i++){
 
                                     JSONObject object = jsonArray.getJSONObject(i);
+                                    object.getString("id");
                                     object.getString("name");
                                     object.getString("created");
                                     object.getString("modified");
                                     object.getString("image");
 
-                                    // context of your activity or fragment
                                     try
                                     {
                                         db.addJson(object);
-
                                     } catch(Exception e) {
                                         Toast.makeText(MainActivity.this, "error: " + e.toString(), Toast.LENGTH_LONG).show();
                                     }
                                 }
-
                             }
+                            db.updateAsUploaded();
+                            Toast.makeText(MainActivity.this, "Manufacturer successfully downloaded", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                            startActivity(intent);
 
-                            Toast.makeText(MainActivity.this, "Data successfully downloaded", Toast.LENGTH_SHORT).show();
+                        }catch (IOException | JSONException e){
+                            Toast.makeText(MainActivity.this, "error: " + e.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        });
+
+        client.newCall(productRequest).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pd.dismiss();
+                        Log.i(TAG, e.getMessage());
+                        Toast.makeText(MainActivity.this, "error: " + e.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            pd.dismiss();
+
+                            JSONArray jsonArray = new JSONArray(response.body().string());
+                            Log.i("get", jsonArray.toString());
+
+                            if(jsonArray != null && jsonArray.length() > 0){
+                                for (int i = 0; i < jsonArray.length(); i++){
+
+                                    JSONObject productObject = jsonArray.getJSONObject(i);
+                                    productObject.getString("product_name");
+                                    productObject.getString("price");
+                                    productObject.getString("manufacturers_id");
+                                    productObject.getString("created");
+                                    productObject.getString("modified");
+                                    productObject.getString("image");
+
+                                    try
+                                    {
+                                        db.productJson(productObject);
+                                    } catch(Exception e) {
+                                        Toast.makeText(MainActivity.this, "error: " + e.toString(), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+                            db.productUpdateAsUploaded();
+                            Toast.makeText(MainActivity.this, "product successfully downloaded", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(MainActivity.this, MainActivity.class);
                             startActivity(intent);
 

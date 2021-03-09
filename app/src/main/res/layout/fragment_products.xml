@@ -4,15 +4,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProductsFragment">
+    tools:context=".Manufacturers.ManufacturersFragment"
+    android:paddingTop="?attr/actionBarSize">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="products"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/productView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/emptyProductImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_empty"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/productView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/productView"
+        app:layout_constraintVertical_bias="0.385"
+        android:alpha="0.1"/>
+
+    <TextView
+        android:id="@+id/productNoData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/emptyProductImage"
+        app:layout_constraintStart_toStartOf="@+id/emptyProductImage"
+        app:layout_constraintTop_toBottomOf="@+id/emptyProductImage"
+        android:alpha="0.4"
+        android:visibility="gone"
+        android:textSize="20dp"
+        android:text="No data"
+        android:layout_marginTop="8dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
