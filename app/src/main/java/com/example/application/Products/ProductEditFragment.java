@@ -68,7 +68,6 @@ public class ProductEditFragment extends Fragment implements View.OnClickListene
         String currentDate = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
         editProductDate.setText(currentDate);
 
-
         Bundle bundle = getArguments();
         ProductModel productModel = bundle.getParcelable("data");
 
