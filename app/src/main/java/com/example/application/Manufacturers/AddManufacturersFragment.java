@@ -58,7 +58,7 @@ public class AddManufacturersFragment extends Fragment {
     private Button chooseImage, addButton;
     Bitmap bitmap;
     Uri selectedImageUri;
-    DbHelper db;
+    DbHelper database;
 
     public AddManufacturersFragment() {
         // Required empty public constructor
@@ -75,7 +75,7 @@ public class AddManufacturersFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_manufacturers, container, false);
 
-        db = new DbHelper(getActivity());
+        database = new DbHelper(getActivity());
 
         manufacturersName = (EditText) view.findViewById(R.id.manufacturersName);
         manufacturersImage = (ImageView) view.findViewById(R.id.manufacturersImage);
